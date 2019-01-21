@@ -1,6 +1,9 @@
 <style lang="less">
+
 </style>
+
 <template lang="pug">
+text not blank
 </template>
 
 <script>
@@ -8,7 +11,7 @@
 
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: 'test'
+      navigationBarTitleText: '统一身份认证登录'
     }
 
     components = {
@@ -22,7 +25,8 @@
     computed = {
     }
 
-    onLoad() {
+    onLoad(obj) {
+      console.log(obj)
     }
   }
 </script>
