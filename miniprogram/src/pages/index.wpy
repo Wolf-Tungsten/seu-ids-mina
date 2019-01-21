@@ -27,6 +27,7 @@ text not blank
 
     onLoad(obj) {
       console.log(obj)
+      // 根据是否存在AppId判断跳转
     }
   }
 </script>

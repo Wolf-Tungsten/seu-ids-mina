@@ -1,5 +1,5 @@
 {
-  "name": "login",
+  "name": "checkVerifyCode",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
+    "axios-cookiejar-support": "^0.4.2",
+    "cheerio": "^1.0.0-rc.2",
+    "moment": "^2.23.0",
+    "tough-cookie": "^3.0.0",
     "wx-server-sdk": "latest"
   }
 }
