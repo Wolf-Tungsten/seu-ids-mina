@@ -28,12 +28,26 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 2,
 			"list": [
 				{
 					"id": -1,
 					"name": "db guide",
-					"pathName": "pages/databaseGuide/databaseGuide"
+					"pathName": "pages/databaseGuide/databaseGuide",
+					"query": ""
+				},
+				{
+					"id": 1,
+					"name": "公众号调起",
+					"pathName": "pages/index",
+					"query": "IDS_SESSION=test_ids_session&FORCE=1&APPID=test_official_account_appid",
+					"scene": "1074"
+				},
+				{
+					"id": 2,
+					"name": "错误页",
+					"pathName": "pages/error",
+					"query": ""
 				}
 			]
 		}

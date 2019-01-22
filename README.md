@@ -51,13 +51,15 @@
     {
         "title":"东南大学统一身份认证登录", // 名称可自定义，应对用户操作起到引导、解释作用
         "appid":"wxaef6d2413690047f", // 统一身份认证小程序APPID
-        "pagepath":"pages/idsAuth?IDS_SESSION=<IDS_SESSION>&FORCE=<FORCE>", // 指定参数
+        "pagepath":"pages/idsAuth?APPID=<APPID>&IDS_SESSION=<IDS_SESSION>&FORCE=<FORCE>", // 指定参数
         "thumb_media_id":"thumb_media_id"
     }
 }
 ```
 
 **参数解释**
+
+    - APPID ：应用APPID
 
     - IDS_SESSION ：由业务服务器生成和用户身份对应的字符串
 

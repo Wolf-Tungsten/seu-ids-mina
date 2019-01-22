@@ -71,6 +71,19 @@ view 场景值 {{scene}}
       if(scene === 1074 || scene === 1082){
         // 从公众号进入
         console.log('微信公众号调起')
+        let referreredAppId = onShowInfo.query.APPID
+        let ids_session = onShowInfo.query.IDS_SESSION
+        let force = onShowInfo.query.FORCE
+        console.log(`- 来源公众号APPID：${referreredAppId}`)
+        console.log(`- IDS_SESSION：${ids_session}`)
+        console.log(`- FORCE：${!!force}`)
+        referreredAppId = null
+        if(!referreredAppId || !ids_session){
+          // 如果没有有效传入AppID和ids_session
+          // 跳转到错误页面
+          this.$preload('error_info','调用方式不正确，请联系应用提供者')
+          this.$redirect('./error')
+        }
       } else if (scene === 1037){
         // 从小程序进入
         console.log('小程序调起')

@@ -17,6 +17,7 @@
   "author": "Wolf-Tungsten <canis.tungsten@foxmail.com>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^2.4.2",
     "wepy": "^1.6.0",
     "wepy-async-function": "^1.4.4",
     "wepy-com-toast": "^1.0.2"
