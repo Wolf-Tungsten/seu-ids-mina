@@ -8,7 +8,7 @@ text not blank
 
 <script>
   import wepy from 'wepy'
-
+  import 'wepy-async-function'
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '统一身份认证登录'
@@ -25,9 +25,34 @@ text not blank
     computed = {
     }
 
-    onLoad(obj) {
-      console.log(obj)
-      // 根据是否存在AppId判断跳转
+    onLoad() {
+      this.checkStatus()
+    }
+
+    async checkStatus(){
+      // 获取小程序启动信息
+      let onShowInfo = wx.getStorageSync('onShowInfo')
+      console.log(onShowInfo)
+      wx.showLoading({
+        title:'同步微信用户信息'
+      })
+      /**
+       * 获取微信用户信息
+       * 获取用户的OPENID
+       * OPENID是小程序区分用户的标志
+       */
+      // 首先从存储里检查是否存在已有记录
+      let wxUserInfo = wx.getStorageSync('wxUserInfo')
+      if(!wxUserInfo){
+        // 存在已有记录则不需要获取
+        let res = await wx.cloud.callFunction({
+          name: 'getOpenId'
+        })
+        if(res && res.result){
+          wx.setStorageSync('wxUserInfo', res.result)
+          wxUserInfo = res.result
+        }
+      }
     }
   }
 </script>

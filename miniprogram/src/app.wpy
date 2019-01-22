@@ -13,7 +13,6 @@
 import wepy from 'wepy'
 import 'wepy-async-function'
 
-
 export default class extends wepy.app {
   config = {
     pages: [
@@ -38,26 +37,15 @@ export default class extends wepy.app {
 
   onLaunch() {
     wx.cloud.init({
-      env: 'ids-mina-dev'
+      env: 'ids-mina-dev-3bdc8e'
     })
   }
 
   onShow(obj){
-    if(obj.referrerInfo && obj.referrerInfo.extraData){
-      wx.setStorageSync('extraData',obj.referrerInfo.extraData)
-    } else {
-      wx.removeStorageSync('extraData')
-    }
-    let appId = obj.referrerInfo && obj.referrerInfo.appId
-    let scene = obj.scene
-    /**DEBUG */
-    wx.setStorageSync('extraData',{
-      forceLogin:true, //对于安全性要求较高的服务，强制用户使用用户名/密码登录
-      token:'', //由第三方应用自行生成管理，用于向其服务器推送消息作为其内部标示
-    })
-    appId = 'testAppId'
+    // 拦截所有页面信息，将页面信息存储后跳转到index页面，在index页面进行路由处理
+    wx.setStorageSync('onShowInfo', obj)
     wx.reLaunch({
-      url:`/pages/index?scene=${scene}&hasReferrer=${!!(obj.referrerInfo && obj.referrerInfo.appId)}&appId=${appId}`
+      url:`/pages/index`
     })
   }
 }
