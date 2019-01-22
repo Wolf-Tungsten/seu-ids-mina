@@ -67,6 +67,17 @@ view 场景值 {{scene}}
       let onShowInfo = wx.getStorageSync('onShowInfo')
       console.log(onShowInfo)
       this.scene = onShowInfo.scene
+      let scene = onShowInfo.scene
+      if(scene === 1074 || scene === 1082){
+        // 从公众号进入
+        console.log('微信公众号调起')
+      } else if (scene === 1037){
+        // 从小程序进入
+        console.log('小程序调起')
+      } else {
+        // 其他进入方式
+        console.log('其他方式')
+      }
     }
   }
 </script>
