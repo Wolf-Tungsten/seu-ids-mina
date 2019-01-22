@@ -3,7 +3,8 @@
 </style>
 
 <template lang="pug">
-text not blank
+view 当前openid {{openid}}
+view 场景值 {{scene}}
 </template>
 
 <script>
@@ -19,7 +20,8 @@ text not blank
 
 
     data = {
-     
+     openid:'',
+     scene:0
     }
 
     computed = {
@@ -31,8 +33,6 @@ text not blank
 
     async checkStatus(){
       // 获取小程序启动信息
-      let onShowInfo = wx.getStorageSync('onShowInfo')
-      console.log(onShowInfo)
       wx.showLoading({
         title:'同步微信用户信息'
       })
@@ -44,7 +44,7 @@ text not blank
       // 首先从存储里检查是否存在已有记录
       let wxUserInfo = wx.getStorageSync('wxUserInfo')
       if(!wxUserInfo){
-        // 存在已有记录则不需要获取
+        // 存储已有记录则不需要获取 - OPENID是不会发生变化的
         let res = await wx.cloud.callFunction({
           name: 'getOpenId'
         })
@@ -53,6 +53,20 @@ text not blank
           wxUserInfo = res.result
         }
       }
+      wx.hideLoading()
+      this.openid = wxUserInfo.openid
+      console.log(wxUserInfo)
+      /**
+       * 分析小程序启动方式
+       * 根据场景值进行判断
+       * 关注的场景值：
+       * 1074/1082 - 从微信公众号消息卡片/文字链进入
+       * 1037 - 从微信小程序进入
+       * 其他
+       */
+      let onShowInfo = wx.getStorageSync('onShowInfo')
+      console.log(onShowInfo)
+      this.scene = onShowInfo.scene
     }
   }
 </script>
