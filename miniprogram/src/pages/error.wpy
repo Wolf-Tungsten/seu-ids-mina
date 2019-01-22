@@ -10,19 +10,20 @@
         margin-top:60rpx;
         font-size:40rpx;
         font-weight: 400;
-        margin-bottom: 10rpx;
+        margin-bottom: 20rpx;
     }
 
     .hint{
         font-size:28rpx;
         color: #808080;
+        margin: 0 64rpx;
     }
 }
 </style>
 
 <template lang="pug">
 view#error-page
-    icon(type="warn" size="150")
+    icon(type="warn" size="120")
     text.solid 出现错误
     text.hint {{error_info}}
 </template>

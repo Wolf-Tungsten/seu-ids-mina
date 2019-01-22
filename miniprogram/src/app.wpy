@@ -1,4 +1,7 @@
 <style lang="less">
+page{
+  background: #f8f8f8
+}
 .container {
   height: 100%;
   display: flex;
@@ -23,7 +26,8 @@ export default class extends wepy.app {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: '统一身份认证登录',
-      navigationBarTextStyle: 'black'
+      navigationBarTextStyle: 'black',
+      backgroundColor: "#f8f8f8"
     }
   }
 

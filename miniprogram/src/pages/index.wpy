@@ -1,18 +1,129 @@
 <style lang="less">
-
+#info-check{
+  width: 750rpx;
+  background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  .logo{
+    margin-top:40rpx;
+    width: 250rpx;
+    height: 250rpx;
+    align-self: center;
+  }
+  .title{
+    margin-top:30rpx;
+    text-align: center;
+    font-size:40rpx;
+    font-weight: bold;
+    margin-bottom: 10rpx;
+  }
+  .center{
+    text-align: center;
+  }
+  .hint{
+    font-size:28rpx;
+    color: #808080;
+  }
+  .secondary{
+    color: #808080
+  }
+  .panel{
+    background-color: #ffffff;
+    border-style: solid none;
+    border-width: 0.5px;
+    border-color: #e5e5e5;
+    margin-top:30rpx;
+    .item{
+      background-color:#FFF;
+      margin:25rpx;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      .itemName{
+        font-weight: bold;
+        font-size:32rpx;
+        line-height: 32rpx;
+        flex-basis: 160rpx;
+      }
+      .itemValue{
+        font-size:32rpx;
+        line-height: 32rpx;
+        max-width: 550rpx;
+        margin: 0 25rpx;
+      }
+    }
+    .line{
+      border-top-style: solid;
+      border-top-color: #e5e5e5;
+      border-top-width: 0.5px;
+      margin-left:20rpx;
+      width: 100%;
+    }
+  }
+  .info{
+    margin: 30rpx;
+    .hint{
+      display:flex;
+      align-items: center;
+      margin: 10rpx 0;
+      icon{
+        margin-right:10rpx;
+      }
+    }
+    .first{
+      margin-bottom: 10rpx;
+      margin-left: 0rpx;
+    }
+  }
+  button{
+      width:650rpx;
+      margin-top: 15rpx;
+  }
+}
 </style>
 
 <template lang="pug">
-view 当前openid {{openid}}
-view 场景值 {{scene}}
+view#info-check
+  image.logo(src="cloud://ids-mina-dev-3bdc8e.6964-ids-mina-dev-3bdc8e/校徽.png")
+  view.title 统一身份认证授权
+  view.hint.center 正在对以下应用进行统一身份认证授权
+  view.panel
+    view.item
+      text.itemName 应用名称
+      text.itemValue {{appTitle}}
+    view.line
+    view.item
+      text.itemName 应用提供者
+      text.itemValue {{appProvider}}
+    view.line
+    view.item
+      text.itemName 应用描述
+      text.itemValue.secondary {{appDesc}}
+  view.info
+    view.hint.first 完成授权后，应用将会：
+    view.hint  
+      icon(type="success_no_circle" size="20")
+      text 确认您的在校生/教职员工身份
+    view.hint
+      icon(type="success_no_circle" size="20")
+      text 获取您的真实姓名
+    view.hint
+      icon(type="success_no_circle" size="20")
+      text 获取您的一卡通号
+  button(type="primary" @tap="confirm") 确认授权
+
 </template>
 
 <script>
   import wepy from 'wepy'
   import 'wepy-async-function'
+  const db = wx.cloud.database()
+
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '统一身份认证登录'
+      navigationBarTitleText: '统一身份认证授权',
+      backgroundColor: "#f8f8f8"
     }
 
     components = {
@@ -20,11 +131,21 @@ view 场景值 {{scene}}
 
 
     data = {
-     openid:'',
-     scene:0
+     appTitle:'正在加载...',
+     appDesc:'正在加载...',
+     appProvider:'正在加载...',
+     appId:'',
+     ids_session:'',
+     type:''
     }
 
     computed = {
+    }
+
+    methods = {
+      async confirm(){
+        console.log('确认')
+      }
     }
 
     onLoad() {
@@ -69,6 +190,7 @@ view 场景值 {{scene}}
       this.scene = onShowInfo.scene
       let scene = onShowInfo.scene
       if(scene === 1074 || scene === 1082){
+        this.type='公众号'
         // 从公众号进入
         console.log('微信公众号调起')
         let referreredAppId = onShowInfo.query.APPID
@@ -77,13 +199,33 @@ view 场景值 {{scene}}
         console.log(`- 来源公众号APPID：${referreredAppId}`)
         console.log(`- IDS_SESSION：${ids_session}`)
         console.log(`- FORCE：${!!force}`)
-        referreredAppId = null
+        this.appId = referreredAppId
+        this.ids_session = ids_session
+        this.force = force
         if(!referreredAppId || !ids_session){
           // 如果没有有效传入AppID和ids_session
           // 跳转到错误页面
           this.$preload('error_info','调用方式不正确，请联系应用提供者')
           this.$redirect('./error')
         }
+        // 调用方式正确，检查权限
+        let dbRes = await db.collection('app-authorization').where({
+          appId:referreredAppId,
+          enable:true
+        }).get()
+        console.log(dbRes)
+        dbRes = dbRes.data
+        if(dbRes.length!==1){
+          // 严格限制对应关系
+          this.$preload('error_info','应用未正确授权，可能是非法应用，请注意保护个人信息安全')
+          this.$redirect('./error')
+        }
+        dbRes = dbRes[0]
+        console.log(dbRes)
+        this.appTitle = dbRes.appTitle
+        this.appDesc = dbRes.appDesc
+        this.appProvider = dbRes.appProvider
+        this.$apply()
       } else if (scene === 1037){
         // 从小程序进入
         console.log('小程序调起')
