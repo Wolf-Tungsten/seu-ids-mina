@@ -43,8 +43,21 @@ export default class extends wepy.app {
   }
 
   onShow(obj){
+    if(obj.referrerInfo && obj.referrerInfo.extraData){
+      wx.setStorageSync('extraData',obj.referrerInfo.extraData)
+    } else {
+      wx.removeStorageSync('extraData')
+    }
+    let appId = obj.referrerInfo && obj.referrerInfo.appId
+    let scene = obj.scene
+    /**DEBUG */
+    wx.setStorageSync('extraData',{
+      forceLogin:true, //对于安全性要求较高的服务，强制用户使用用户名/密码登录
+      token:'', //由第三方应用自行生成管理，用于向其服务器推送消息作为其内部标示
+    })
+    appId = 'testAppId'
     wx.reLaunch({
-      url:`/pages/index?scene=${obj.scene}&hasReferrer=${!!(obj.referrerInfo && obj.referrerInfo.appId)}&appId=${obj.referrerInfo && obj.referrerInfo.appId}`
+      url:`/pages/index?scene=${scene}&hasReferrer=${!!(obj.referrerInfo && obj.referrerInfo.appId)}&appId=${appId}`
     })
   }
 }
