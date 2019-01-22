@@ -1,0 +1,55 @@
+<style lang="less">
+#error-page{
+    padding-top: 100rpx;
+    width: 750rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .solid{
+        margin-top:60rpx;
+        font-size:40rpx;
+        font-weight: 400;
+        margin-bottom: 20rpx;
+    }
+
+    .hint{
+        font-size:28rpx;
+        color: #808080;
+        margin: 0 64rpx;
+    }
+}
+</style>
+
+<template lang="pug">
+view#error-page
+    icon(type="warn" size="120")
+    text.solid 出现错误
+    text.hint {{error_info}}
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '错误提示'
+    }
+
+    components = {
+    }
+
+
+    data = {
+        error_info:''
+    }
+
+    computed = {
+    }
+
+    onLoad(obj, preload) {
+      console.log(preload)
+      this.error_info = preload.preload.error_info
+    }
+  }
+</script>

@@ -1,0 +1,219 @@
+<style lang="less">
+#auth{
+  width: 750rpx;
+  background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  .logo{
+    margin-top:40rpx;
+    width: 250rpx;
+    height: 250rpx;
+    align-self: center;
+  }
+  .title{
+    margin-top:50rpx;
+    font-size:40rpx;
+    font-weight: bold;
+    margin-bottom: 10rpx;
+  }
+  .center{
+    text-align: center;
+  }
+  .hint{
+    font-size:28rpx;
+    color: #808080;
+  }
+  .secondary{
+    color: #808080
+  }
+  .panel{
+    background-color: #ffffff;
+    border-style: solid none;
+    border-width: 0.5px;
+    border-color: #e5e5e5;
+    margin-top:30rpx;
+    .item{
+      background-color:#FFF;
+      margin-left:25rpx;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 20rpx 0;
+      .itemName{
+        font-weight: bold;
+        font-size:32rpx;
+        line-height: 32rpx;
+        flex-basis: 160rpx;
+      }
+      .itemValue{
+        font-size:32rpx;
+        line-height: 32rpx;
+        max-width: 400rpx;
+        margin: 0 20rpx;
+      }
+      .verifyCodeBox{
+        display: flex;
+        .itemValue{
+          flex-grow: 1;
+        }
+        .verifyCode{
+          width: 180rpx;
+          height: 50rpx;
+        }
+      }
+    }
+    .line{
+      border-top-style: solid;
+      border-top-color: #e5e5e5;
+      border-top-width: 0.5px;
+      margin-left:20rpx;
+      width: 100%;
+    }
+  }
+  .info{
+    margin: 30rpx;
+    .hint{
+      display:flex;
+      align-items: center;
+      margin: 10rpx 0;
+      icon{
+        margin-right:10rpx;
+      }
+    }
+    .first{
+      margin-bottom: 10rpx;
+      margin-left: 0rpx;
+    }
+  }
+  button{
+      width:650rpx;
+      margin-top: 30rpx;
+  }
+}
+</style>
+
+<template lang="pug">
+view#auth
+  view.title.center 统一身份认证登录
+  view.hint.center 请通过统一身份认证登录以完成授权
+  view.panel
+    view.item
+      text.itemName 一卡通号
+      input.itemValue(bindinput="bindCardnum" placeholder="一卡通号" placeholder-class="hint")
+    view.line
+    view.item
+      text.itemName 认证密码
+      input.itemValue(type="password" bindinput="bindPassword" placeholder="统一身份认证密码" placeholder-class="hint")
+    view.line(wx:if="{{needCaptcha}}")
+    view.item(wx:if="{{needCaptcha}}")
+      text.itemName 验证码
+      view.verifyCodeBox
+        input.itemValue(bindinput="bindVerifyCode" placeholder="验证码" placeholder-class="hint")
+        image.verifyCode(@tap="changePassword" src="captchaBase64")
+  view.info(wx:if="{{error}}")
+    view.hint  
+      icon(type="warn" size="20")
+      text {{error_hint}}
+  button(disabled="{{cardnum.length!=9}}" type="primary" @tap="confirm") 统一身份认证登录
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  const db = wx.cloud.database()
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '统一身份认证授权',
+      backgroundColor: "#f8f8f8"
+    }
+
+    components = {
+    }
+
+
+    data = {
+     cardnum:'',
+     password:'',
+     verifyCode:'',
+     cardnumChecked:false,
+     appId:'',
+     ids_session:'',
+     type:'',
+     needCaptcha:false,
+     captchaBase64:'',
+     error:false,
+     force:false,
+     cookie:'',
+     form:{},
+     passwordSalt:''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      bindCardnum(e){
+        this.cardnum = e.detail.value
+      },
+      bindPassword(e){
+        this.password = e.detail.value
+      },
+      bindVerifyCode(e){
+        this.verifyCode = e.detail.value
+      },
+      async confirm(){
+        if(!this.needCaptcha){
+          // 检查是否需要验证码
+          wx.showLoading({
+            title:'获取预登录信息'
+          })
+          let res1 = await wx.cloud.callFunction({
+            name:'preLogin',
+            data:{
+              cardnum:this.cardnum
+            }
+          })
+          console.log(res1)
+          if(res1.data.needCaptcha){
+            // 发现需要验证码，暂存现有情况等待用户补全数据继续登录
+            this.needCaptcha = res1.data.needCaptcha
+            this.captchaBase64 = `data:image/jpeg;base64,${res1.data.captchaBase64}`
+            this.form = res1.data.form
+            this.cookie = res1.data.cookie
+            this.passwordSalt = res1.data.passwordDefaultEncryptSalt
+            this.$apply()
+            return
+          } else {
+            // 不需要验证码
+            res1 = res1.data
+            // TODO：调用云函数检查是否认证通过
+            // TODO：认证成功则进行成功处理逻辑
+          }
+        } else {
+          // 已经出现验证码就不再进行检查，此时form、passwordSalt、cookie均已得到
+          // TODO：调用云函数检查是否认证通过
+          // TODO：认证成功则进行成功处理逻辑
+          this.needCaptcha = false
+        }
+      }
+    }
+
+    onLoad(option, preload) {
+      if(preload.preload.refer){
+        this.force = true // 标记当前处于认证流程中
+        preload = preload.preload.refer
+        this.openid = preload.openid
+        this.ids_session = preload.ids_session
+        this.appId = preload.appId
+        this.type = preload.type
+      } else if(preload.preload.openid) {
+        this.force = false // 当前非认证过程
+        preload = preload.preload.openid
+        this.openid = preload.openid
+      }
+    }
+  }
+</script>

@@ -136,7 +136,9 @@ view#info-check
      appProvider:'正在加载...',
      appId:'',
      ids_session:'',
-     type:''
+     force:false,
+     type:'',
+     openid:''
     }
 
     computed = {
@@ -144,7 +146,40 @@ view#info-check
 
     methods = {
       async confirm(){
-        console.log('确认')
+        if(this.force){
+          // 强制登录
+          this.$preload('refer',{
+            appId:this.appId,
+            type:this.type,
+            openid:this.openid,
+            ids_session:this.ids_session
+          })
+          this.$navigate('./auth')
+        } else {
+          // 复用信息登录
+          wx.showLoading({
+            title:'获取认证信息'
+          })
+          let dbRes = await db.collection('user-info').where({
+            openid
+          }).get()
+          wx.hideLoading()
+          dbRes = dbRes.data[0]
+          if(dbRes){
+            // 存在已有信息
+            // TODO:完成认证逻辑
+            console.log(dbRes)
+          } else {
+            // 没有信息，需要登录
+            this.$preload('refer',{
+            appId:this.appId,
+            type:this.type,
+            openid:this.openid,
+            ids_session:this.ids_session
+            })
+            this.$navigate('./auth')
+          }
+        }
       }
     }
 
@@ -176,6 +211,7 @@ view#info-check
       }
       wx.hideLoading()
       this.openid = wxUserInfo.openid
+      this.$apply()
       console.log(wxUserInfo)
       /**
        * 分析小程序启动方式
@@ -195,7 +231,7 @@ view#info-check
         console.log('微信公众号调起')
         let referreredAppId = onShowInfo.query.APPID
         let ids_session = onShowInfo.query.IDS_SESSION
-        let force = onShowInfo.query.FORCE
+        let force = !!onShowInfo.query.FORCE
         console.log(`- 来源公众号APPID：${referreredAppId}`)
         console.log(`- IDS_SESSION：${ids_session}`)
         console.log(`- FORCE：${!!force}`)
@@ -227,11 +263,18 @@ view#info-check
         this.appProvider = dbRes.appProvider
         this.$apply()
       } else if (scene === 1037){
+        this.type='小程序'
         // 从小程序进入
         console.log('小程序调起')
+        
       } else {
         // 其他进入方式
         console.log('其他方式')
+        // 其他方式进入后跳转到个人信息展示页
+        this.$preload('openid',{
+          openid:wxUserInfo.openid
+        })
+        this.$redirect('./info')
       }
     }
   }

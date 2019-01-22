@@ -1,0 +1,154 @@
+<style lang="less">
+#info-check{
+  width: 750rpx;
+  background: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  .logo{
+    margin-top:40rpx;
+    width: 250rpx;
+    height: 250rpx;
+    align-self: center;
+  }
+  .title{
+    margin-top:30rpx;
+    text-align: center;
+    font-size:40rpx;
+    font-weight: bold;
+    margin-bottom: 10rpx;
+  }
+  .center{
+    text-align: center;
+  }
+  .hint{
+    font-size:28rpx;
+    color: #808080;
+  }
+  .secondary{
+    color: #808080
+  }
+  .panel{
+    background-color: #ffffff;
+    border-style: solid none;
+    border-width: 0.5px;
+    border-color: #e5e5e5;
+    margin-top:30rpx;
+    .item{
+      background-color:#FFF;
+      margin:25rpx;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      .itemName{
+        font-weight: bold;
+        font-size:32rpx;
+        line-height: 32rpx;
+        flex-basis: 160rpx;
+      }
+      .itemValue{
+        font-size:32rpx;
+        line-height: 32rpx;
+        max-width: 550rpx;
+        margin: 0 25rpx;
+      }
+    }
+    .line{
+      border-top-style: solid;
+      border-top-color: #e5e5e5;
+      border-top-width: 0.5px;
+      margin-left:20rpx;
+      width: 100%;
+    }
+  }
+  .info{
+    margin: 30rpx;
+    .hint{
+      display:flex;
+      align-items: center;
+      margin: 10rpx 0;
+      icon{
+        margin-right:10rpx;
+      }
+    }
+    .first{
+      margin-bottom: 10rpx;
+      margin-left: 0rpx;
+    }
+  }
+  button{
+      width:650rpx;
+      margin-top: 15rpx;
+  }
+}
+</style>
+
+<template lang="pug">
+view#info-check
+  image.logo(src="cloud://ids-mina-dev-3bdc8e.6964-ids-mina-dev-3bdc8e/校徽.png")
+  view.title 统一身份认证信息
+  view.hint.center 您的身份认证信息如下，当您通过统一身份认证接入小程序对微信公众号/小程序进行授权时，第三方应用将得到以下信息。
+  view.panel
+    view.item
+      text.itemName 真是姓名
+      text.itemValue {{name}}
+    view.line
+    view.item
+      text.itemName 一卡通号
+      text.itemValue {{cardnum}}
+    view.line
+    view.item
+      text.itemName 身份
+      text.itemValue.secondary {{identity}}
+  view.info
+    view.hint  
+      icon(type="success_no_circle" size="20")
+      text 您的微信用户已与在校身份绑定
+    view.hint
+      icon(type="success_no_circle" size="20")
+      text 可以授权其他第三方应用
+    view.hint
+      icon(type="info" size="20")
+      text 如需解绑请与管理单位联系
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  const db = wx.cloud.database()
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '统一身份认证授权',
+      backgroundColor: "#f8f8f8"
+    }
+
+    components = {
+    }
+
+
+    data = {
+     appTitle:'正在加载...',
+     appDesc:'正在加载...',
+     appProvider:'正在加载...',
+     appId:'',
+     ids_session:'',
+     force:false,
+     type:''
+    }
+
+    computed = {
+    }
+
+    methods = {
+      async confirm(){
+        console.log('确认')
+      }
+    }
+
+    async onLoad() {
+      
+    }
+  }
+</script>

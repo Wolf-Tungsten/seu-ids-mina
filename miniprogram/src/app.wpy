@@ -20,7 +20,10 @@ export default class extends wepy.app {
   config = {
     pages: [
       'pages/index',
-      'pages/error'
+      'pages/error',
+      'pages/info',
+      'pages/auth',
+      'pages/success'
     ],
     window: {
       backgroundTextStyle: 'light',
