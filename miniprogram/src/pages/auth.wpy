@@ -108,9 +108,9 @@ view#auth
     view.line(wx:if="{{needCaptcha}}")
     view.item(wx:if="{{needCaptcha}}")
       text.itemName 验证码
-      view.verifyCodeBox(@tap="refreshVerifyCode")
+      view.verifyCodeBox
         input.itemValue(bindinput="bindVerifyCode" placeholder="看不清？点击验证码即可更换" placeholder-class="hint")
-        image.verifyCode(src="{{captchaBase64}}")
+        image.verifyCode(@tap="refreshVerifyCode" src="{{captchaBase64}}")
   view.info(wx:if="{{error}}")
     view.hint  
       icon(type="warn" size="20")
@@ -207,16 +207,44 @@ view#auth
             this.$apply()
             return
           } else {
-            console.log(res1)
             // 不需要验证码
             res1 = res1.result
-            // TODO：调用云函数检查是否认证通过
+            let form = res1.form
+            let cookie = res1.cookie
+            let passwordSalt = res1.passwordDefaultEncryptSalt
+            let cardnum = this.cardnum
+            let password = this.password
+            let needCaptcha = false
+            let captcha = ''
+            wx.showLoading({
+              title:'统一身份认证登录'
+            })
+            let res2 = await wx.cloud.callFunction({
+              name:'login',
+              data:{form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha}
+            })
+            wx.hideLoading()
+            console.log({form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha})
+            console.log(res2)
+
             // TODO：认证成功则进行成功处理逻辑
           }
         } else {
           // 已经出现验证码就不再进行检查，此时form、passwordSalt、cookie均已得到
-          // TODO：调用云函数检查是否认证通过
+          let form = this.form
+          let cookie = this.cookie
+          let passwordSalt = this.passwordSalt
+          let cardnum = this.cardnum
+          let password = this.password
+          let needCaptcha = true
+          let captcha = this.verifyCode
+          let res2 = await wx.cloud.callFunction({
+            name:'login',
+            data:{form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha}
+          })
+          console.log(res2)
           // TODO：认证成功则进行成功处理逻辑
+          // 清除验证码
           this.needCaptcha = false
         }
       }
@@ -226,14 +254,12 @@ view#auth
       if(preload.preload.refer){
         this.force = true // 标记当前处于认证流程中
         preload = preload.preload.refer
-        this.openid = preload.openid
         this.ids_session = preload.ids_session
         this.appId = preload.appId
         this.type = preload.type
       } else if(preload.preload.openid) {
         this.force = false // 当前非认证过程
         preload = preload.preload.openid
-        this.openid = preload.openid
       }
     }
   }
