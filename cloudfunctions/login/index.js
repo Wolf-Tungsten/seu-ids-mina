@@ -34,7 +34,8 @@ exports.main = async (event, context) => {
   url = 'https://newids.seu.edu.cn/authserver/login?goto=http://my.seu.edu.cn/index.portal'
   res = await axios.get(url, {
     jar: cookieJar,
-    withCredentials: true
+    withCredentials: true,
+    validateStatus: s => s < 400
   })
   let passwordDefaultEncryptSalt = /var pwdDefaultEncryptSalt = "([A-Za-z0-9]+)";/.exec(res.data)[1]
   let $ = cheerio.load(res.data)
@@ -55,11 +56,16 @@ exports.main = async (event, context) => {
   // 执行到此处说明身份认证成功， 开始抓取信息
   res = await axios.get('http://my.seu.edu.cn/index.portal?.pn=p1681',{
     jar: cookieJar,
-    withCredentials: true
+    withCredentials: true,
+    validateStatus: s => s < 400
   })
   // 解析姓名
   let name = /欢迎您：([^<]*)/.exec(res.data) || []
+  try{
   name = name[1] || ''
+  } catch(e) {
+    return res
+  }
   if(!name){
     // 没有获取到姓名，要求重试
     return {

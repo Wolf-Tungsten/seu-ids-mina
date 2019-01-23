@@ -115,7 +115,7 @@ view#auth
     view.hint  
       icon(type="warn" size="20")
       text {{error_hint}}
-  button(disabled="{{cardnum.length!=9}}" type="primary" @tap="confirm") 统一身份认证登录
+  button(disabled="{{cardnum.length!=9}}" type="primary" @tap="login") 统一身份认证登录
 
 </template>
 
@@ -138,17 +138,12 @@ view#auth
      cardnum:'',
      password:'',
      verifyCode:'',
-     cardnumChecked:false,
      appId:'',
      ids_session:'',
      type:'',
      needCaptcha:false,
-     captchaBase64:'',
      error:false,
-     force:false,
-     cookie:'',
-     form:{},
-     passwordSalt:''
+     inProcess:false,
     }
 
     computed = {
@@ -164,89 +159,19 @@ view#auth
       bindVerifyCode(e){
         this.verifyCode = e.detail.value
       },
-      async refreshVerifyCode(){
+      async login(){
         wx.showLoading({
-          title:'刷新验证码'
+          title:'正在进行身份认证'
         })
-        let res = await wx.cloud.callFunction({
-            name:'preLogin',
-            data:{
-              cardnum:this.cardnum
-            }
-        })
-        // 重新获取验证码要更新全部相关字段
-        this.needCaptcha = res.result.needCaptcha
-        this.captchaBase64 = `data:image/jpeg;base64,${res.result.captchaBase64}`
-        this.form = res.result.form
-        this.cookie = res.result.cookie
-        this.passwordSalt = res.result.passwordDefaultEncryptSalt
-        this.$apply()
-        wx.hideLoading()
-        return
-      },
-      async confirm(){
-        if(!this.needCaptcha){
-          // 检查是否需要验证码
-          wx.showLoading({
-            title:'获取预登录信息'
-          })
-          let res1 = await wx.cloud.callFunction({
-            name:'preLogin',
-            data:{
-              cardnum:this.cardnum
-            }
-          })
-          wx.hideLoading()
-          if(res1.result.needCaptcha){
-            // 发现需要验证码，暂存现有情况等待用户补全数据继续登录
-            this.needCaptcha = res1.result.needCaptcha
-            this.captchaBase64 = `data:image/jpeg;base64,${res1.result.captchaBase64}`
-            this.form = res1.result.form
-            this.cookie = res1.result.cookie
-            this.passwordSalt = res1.result.passwordDefaultEncryptSalt
-            this.$apply()
-            return
-          } else {
-            // 不需要验证码
-            res1 = res1.result
-            let form = res1.form
-            let cookie = res1.cookie
-            let passwordSalt = res1.passwordDefaultEncryptSalt
-            let cardnum = this.cardnum
-            let password = this.password
-            let needCaptcha = false
-            let captcha = ''
-            wx.showLoading({
-              title:'统一身份认证登录'
-            })
-            let res2 = await wx.cloud.callFunction({
-              name:'login',
-              data:{form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha}
-            })
-            wx.hideLoading()
-            console.log({form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha})
-            console.log(res2)
-
-            // TODO：认证成功则进行成功处理逻辑
+        let authResult = await wx.cloud.callFunction({
+          name:'login',
+          data:{
+            cardnum:this.cardnum,
+            password:this.password
           }
-        } else {
-          // 已经出现验证码就不再进行检查，此时form、passwordSalt、cookie均已得到
-          let form = this.form
-          let cookie = this.cookie
-          let passwordSalt = this.passwordSalt
-          let cardnum = this.cardnum
-          let password = this.password
-          let needCaptcha = true
-          let captcha = this.verifyCode
-          let res2 = await wx.cloud.callFunction({
-            name:'login',
-            data:{form, cookie, passwordSalt, cardnum, password, needCaptcha,captcha}
-          })
-          console.log(res2)
-          // TODO：认证成功则进行成功处理逻辑
-          // 清除验证码
-          this.needCaptcha = false
-        }
+        })
+        wx.hideLoading()
+        console.log(authResult)
       }
     }
 
