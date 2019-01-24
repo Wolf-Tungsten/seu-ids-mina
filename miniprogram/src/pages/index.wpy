@@ -138,7 +138,8 @@ view#info-check
      ids_session:'',
      force:false,
      type:'',
-     openid:''
+     openid:'',
+     callbackUrl:'' // 微信公众号授权时需要记录callbackUrl
     }
 
     computed = {
@@ -152,7 +153,8 @@ view#info-check
             appId:this.appId,
             type:this.type,
             openid:this.openid,
-            ids_session:this.ids_session
+            ids_session:this.ids_session,
+            callbackUrl:this.callbackUrl
           })
           this.$navigate('./auth')
         } else {
@@ -261,6 +263,7 @@ view#info-check
         this.appTitle = dbRes.appTitle
         this.appDesc = dbRes.appDesc
         this.appProvider = dbRes.appProvider
+        this.callbackUrl = dbRes.callbackUrl
         this.$apply()
       } else if (scene === 1037){
         this.type='小程序'

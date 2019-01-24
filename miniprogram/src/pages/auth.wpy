@@ -78,7 +78,7 @@
       align-items: center;
       margin: 10rpx 0;
       icon{
-        margin-right:10rpx;
+        margin-right:30rpx;
       }
     }
     .first{
@@ -144,6 +144,9 @@ view#auth
      needCaptcha:false,
      error:false,
      inProcess:false,
+     error_hint:'',
+     openid:'',
+     callbackUrl:''
     }
 
     computed = {
@@ -172,19 +175,64 @@ view#auth
         })
         wx.hideLoading()
         console.log(authResult)
+        if(authResult.result){
+          let res = authResult.result
+          if(!res.success){
+            // 认证失败则显示提示
+            this.error = true
+            this.error_hint = res.reason
+            this.$apply()
+            return
+          }
+          // 执行到此处说明认证成功
+          delete res.success
+          wx.showLoading({
+            title:'更新认证信息'
+          })
+          let oldRecord = await db.collection('user-info').where({openid:res.openid}).get()
+          console.log(oldRecord)
+          if(oldRecord.data.length === 1){
+            // 存在认证记录
+            oldRecord = oldRecord.data[0]
+            await db.collection('user-info').doc(oldRecord._id).remove() //删除旧记录
+          }
+          // 插入新记录
+          await db.collection('user-info').add({data:res})
+          wx.hideLoading()
+          // 判断是否处于授权流程中
+          if(this.inProcess){
+            console.log('inProcess')
+            // 处于授权流程中
+            if(this.type === '公众号'){
+              // TODO:公众号的处理逻辑
+            } else {
+              // TODO:小程序的处理逻辑
+            }
+          } else {
+            // 不在授权流程中则跳转至个人信息展示页
+            this.$preload('openid',{
+              openid:this.openid
+            })
+            this.$redirect('./info')
+          }
+        }
+        
       }
     }
 
     onLoad(option, preload) {
+      console.log(preload)
       if(preload.preload.refer){
-        this.force = true // 标记当前处于认证流程中
+        console.log('inProcess')
+        this.inProcess = true // 标记当前处于认证流程中
         preload = preload.preload.refer
         this.ids_session = preload.ids_session
         this.appId = preload.appId
         this.type = preload.type
+        this.callbackUrl = preload.callbackUrl
       } else if(preload.preload.openid) {
-        this.force = false // 当前非认证过程
-        preload = preload.preload.openid
+        this.inProcess = false // 当前非认证过程
+        this.openid = preload.preload.openid
       }
     }
   }
