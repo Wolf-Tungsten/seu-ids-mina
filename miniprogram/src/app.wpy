@@ -1,6 +1,8 @@
 <style lang="less">
 page{
-  background: #f8f8f8
+  background: #f8f8f8;
+  width:750rpx;
+  overflow-x: hidden;
 }
 .container {
   height: 100%;
