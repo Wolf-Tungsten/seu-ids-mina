@@ -44,8 +44,11 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
+    // wx.cloud.init({
+    //   env: 'ids-mina-dev-3bdc8e'
+    // })
     wx.cloud.init({
-      env: 'ids-mina-dev-3bdc8e'
+      env: 'ids-mina-prod-3bdc8e'
     })
   }
 
