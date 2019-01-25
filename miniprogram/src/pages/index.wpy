@@ -227,7 +227,7 @@ view#info-check
     async checkStatus(){
       // 获取小程序启动信息
       wx.showLoading({
-        title:'同步微信用户信息'
+        title:'同步用户信息'
       })
       /**
        * 获取微信用户信息

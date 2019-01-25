@@ -165,7 +165,7 @@ view#auth
       },
       async login(){
         wx.showLoading({
-          title:'正在进行身份认证'
+          title:'身份认证中'
         })
         let authResult = await wx.cloud.callFunction({
           name:'login',
