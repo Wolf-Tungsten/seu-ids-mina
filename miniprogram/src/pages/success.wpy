@@ -17,15 +17,16 @@
         font-size:28rpx;
         color: #808080;
         margin: 0 64rpx;
+        text-indent: 2em;
     }
 }
 </style>
 
 <template lang="pug">
 view#error-page
-    icon(type="warn" size="120")
-    text.solid 出现错误
-    text.hint {{error_info}}
+    icon(type="success" size="120")
+    text.solid 授权成功
+    text.hint 现在您可以返回微信公众号并使用完整功能
 </template>
 
 <script>
@@ -33,7 +34,7 @@ view#error-page
   import 'wepy-async-function'
   export default class Index extends wepy.page {
     config = {
-      navigationBarTitleText: '错误提示'
+      navigationBarTitleText: '授权成功'
     }
 
     components = {
@@ -41,15 +42,12 @@ view#error-page
 
 
     data = {
-        error_info:''
     }
 
     computed = {
     }
 
     onLoad(obj, preload) {
-      console.log(preload)
-      this.error_info = preload.preload.error_info
     }
   }
 </script>

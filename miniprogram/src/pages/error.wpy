@@ -17,6 +17,7 @@
         font-size:28rpx;
         color: #808080;
         margin: 0 64rpx;
+        text-indent: 2em;
     }
 }
 </style>

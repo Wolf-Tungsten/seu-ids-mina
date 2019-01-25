@@ -156,14 +156,14 @@ view#info-check
             ids_session:this.ids_session,
             callbackUrl:this.callbackUrl
           })
-          this.$navigate('./auth')
+          this.$redirect('./auth')
         } else {
           // 复用信息登录
           wx.showLoading({
             title:'获取认证信息'
           })
           let dbRes = await db.collection('user-info').where({
-            openid
+            openid:this.openid
           }).get()
           wx.hideLoading()
           dbRes = dbRes.data[0]
@@ -171,6 +171,40 @@ view#info-check
             // 存在已有信息
             // TODO:完成认证逻辑
             console.log(dbRes)
+            if(this.type === '公众号'){
+              wx.showLoading({
+                title:'传输认证信息'
+              })
+              let callbackRes = await wx.cloud.callFunction({
+                name:'successCallback',
+                data:{
+                  callbackUrl:this.callbackUrl, 
+                  name:dbRes.name, 
+                  cardnum:dbRes.cardnum, 
+                  identity:dbRes.identity, 
+                  ids_session:this.ids_session
+                }
+              })
+              wx.hideLoading()
+              if(callbackRes.result){
+                this.$redirect('./success')
+              } else {
+                this.$preload('error_info','目标应用未能正确响应授权请求，授权可能未成功，请返回目标应用重试')
+                this.$redirect('./error')
+              }
+            } else {
+              // 小程序的返回
+              wx.navigateBackMiniProgram({
+                extraData:{
+                  name:dbRes.name, 
+                  cardnum:dbRes.cardnum, 
+                  identity:dbRes.identity
+                },
+                success(res){
+                  console.log(res)
+                }
+              })
+            }
           } else {
             // 没有信息，需要登录
             this.$preload('refer',{
@@ -179,7 +213,7 @@ view#info-check
             openid:this.openid,
             ids_session:this.ids_session
             })
-            this.$navigate('./auth')
+            this.$redirect('./auth')
           }
         }
       }
@@ -227,13 +261,13 @@ view#info-check
       console.log(onShowInfo)
       this.scene = onShowInfo.scene
       let scene = onShowInfo.scene
-      if(scene === 1074 || scene === 1082){
+      if(scene === 1074 || scene === 1082 || scene === 1035 || scene === 1058){
         this.type='公众号'
         // 从公众号进入
         console.log('微信公众号调起')
         let referreredAppId = onShowInfo.query.APPID
         let ids_session = onShowInfo.query.IDS_SESSION
-        let force = !!onShowInfo.query.FORCE
+        let force = onShowInfo.query.FORCE === "1"
         console.log(`- 来源公众号APPID：${referreredAppId}`)
         console.log(`- IDS_SESSION：${ids_session}`)
         console.log(`- FORCE：${!!force}`)
@@ -251,7 +285,6 @@ view#info-check
           appId:referreredAppId,
           enable:true
         }).get()
-        console.log(dbRes)
         dbRes = dbRes.data
         if(dbRes.length!==1){
           // 严格限制对应关系
@@ -269,7 +302,25 @@ view#info-check
         this.type='小程序'
         // 从小程序进入
         console.log('小程序调起')
-        
+        this.appId = onShowInfo.referrerInfo.appId
+        this.force = onShowInfo.referrerInfo.extraData.force
+        // 检查权限
+        let dbRes = await db.collection('app-authorization').where({
+          appId:this.appId,
+          enable:true
+        }).get()
+        dbRes = dbRes.data
+        if(dbRes.length!==1){
+          // 严格限制对应关系
+          this.$preload('error_info','应用未正确授权，可能是非法应用，请注意保护个人信息安全')
+          this.$redirect('./error')
+        }
+        dbRes = dbRes[0]
+        this.appTitle = dbRes.appTitle
+        this.appDesc = dbRes.appDesc
+        this.appProvider = dbRes.appProvider
+        this.callbackUrl = dbRes.callbackUrl
+        this.$apply()
       } else {
         // 其他进入方式
         console.log('其他方式')

@@ -28,7 +28,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 4,
 			"list": [
 				{
 					"id": -1,
@@ -44,10 +44,33 @@
 					"scene": "1074"
 				},
 				{
-					"id": 2,
-					"name": "错误页",
-					"pathName": "pages/error",
-					"query": ""
+					"id": 3,
+					"name": "公众号调起（非强制）",
+					"pathName": "pages/index",
+					"query": "IDS_SESSION=test_ids_session&FORCE=0&APPID=test_official_account_appid",
+					"scene": 1074
+				},
+				{
+					"id": -1,
+					"name": "小程序调起",
+					"pathName": "pages/index",
+					"query": "",
+					"scene": 1037,
+					"referrerInfo": {
+						"appId": "test_appid",
+						"extraData": "{\"force\":true}"
+					}
+				},
+				{
+					"id": -1,
+					"name": "小程序调起（非强制）",
+					"pathName": "pages/index",
+					"query": "",
+					"scene": 1037,
+					"referrerInfo": {
+						"appId": "test_appid",
+						"extraData": "{\"force\":false}"
+					}
 				}
 			]
 		}
