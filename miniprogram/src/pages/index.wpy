@@ -43,12 +43,12 @@
       .itemName{
         font-weight: bold;
         font-size:32rpx;
-        line-height: 32rpx;
+        line-height: 38rpx;
         flex-basis: 160rpx;
       }
       .itemValue{
         font-size:32rpx;
-        line-height: 32rpx;
+        line-height: 38rpx;
         max-width: 550rpx;
         margin: 0 25rpx;
       }
@@ -99,7 +99,7 @@ view#info-check
     view.line
     view.item
       text.itemName 应用描述
-      text.itemValue.secondary {{appDesc}}
+      text.itemValue.secondary.hint {{appDesc}}
   view.info
     view.hint.first 完成授权后，应用将会：
     view.hint  
@@ -279,6 +279,7 @@ view#info-check
           // 跳转到错误页面
           this.$preload('error_info','调用方式不正确，请联系应用提供者')
           this.$redirect('./error')
+          return
         }
         // 调用方式正确，检查权限
         let dbRes = await db.collection('app-authorization').where({
@@ -290,6 +291,7 @@ view#info-check
           // 严格限制对应关系
           this.$preload('error_info','应用未正确授权，可能是非法应用，请注意保护个人信息安全')
           this.$redirect('./error')
+          return
         }
         dbRes = dbRes[0]
         console.log(dbRes)
@@ -314,6 +316,7 @@ view#info-check
           // 严格限制对应关系
           this.$preload('error_info','应用未正确授权，可能是非法应用，请注意保护个人信息安全')
           this.$redirect('./error')
+          return
         }
         dbRes = dbRes[0]
         this.appTitle = dbRes.appTitle

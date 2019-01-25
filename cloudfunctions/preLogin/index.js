@@ -54,7 +54,3 @@ exports.main = async (event, context) => {
     openid: wxContext.OPENID
   }
 }
-
-exports.main({ cardnum: '213162317' }).then((res) => {
-  console.log(res)
-})
