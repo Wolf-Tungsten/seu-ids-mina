@@ -28,7 +28,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 4,
 			"list": [
 				{
 					"id": -1,
@@ -62,13 +62,13 @@
 					}
 				},
 				{
-					"id": -1,
+					"id": 4,
 					"name": "小程序调起（非强制）",
 					"pathName": "pages/index",
 					"query": "",
 					"scene": 1037,
 					"referrerInfo": {
-						"appId": "test_appid",
+						"appId": "wx13a95d42aa950b63",
 						"extraData": "{\"force\":false}"
 					}
 				}

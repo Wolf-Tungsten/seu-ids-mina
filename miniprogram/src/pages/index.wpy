@@ -140,7 +140,8 @@ view#info-check
      force:false,
      type:'',
      openid:'',
-     callbackUrl:'' // 微信公众号授权时需要记录callbackUrl
+     callbackUrl:'',
+     debug:{} // 微信公众号授权时需要记录callbackUrl
     }
 
     computed = {
@@ -306,7 +307,7 @@ view#info-check
         // 从小程序进入
         console.log('小程序调起')
         this.appId = onShowInfo.referrerInfo.appId
-        this.force = onShowInfo.referrerInfo.extraData.force
+        this.force = (!!onShowInfo.referrerInfo.extraData) && (!!onShowInfo.referrerInfo.extraData.force)
         // 检查权限
         let dbRes = await db.collection('app-authorization').where({
           appId:this.appId,
