@@ -11,6 +11,9 @@
 	"appid": "wxaef6d2413690047f",
 	"projectname": "seu-ids-mina",
 	"libVersion": "2.2.5",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"compileType": "miniprogram",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -28,7 +31,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 4,
+			"current": 3,
 			"list": [
 				{
 					"id": -1,
@@ -51,7 +54,7 @@
 					"scene": 1074
 				},
 				{
-					"id": -1,
+					"id": 3,
 					"name": "小程序调起",
 					"pathName": "pages/index",
 					"query": "",

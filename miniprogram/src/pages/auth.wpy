@@ -211,7 +211,7 @@ view#auth
               let callbackRes = await wx.cloud.callFunction({
                 name:'successCallback',
                 data:{
-                  callbackUrl:this.callbackUrl, 
+                  appId:this.appId, 
                   name:res.name, 
                   cardnum:res.cardnum, 
                   identity:res.identity, 

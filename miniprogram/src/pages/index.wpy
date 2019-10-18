@@ -180,11 +180,11 @@ view#info-check
               let callbackRes = await wx.cloud.callFunction({
                 name:'successCallback',
                 data:{
-                  callbackUrl:this.callbackUrl, 
                   name:dbRes.name, 
                   cardnum:dbRes.cardnum, 
                   identity:dbRes.identity, 
-                  ids_session:this.ids_session
+                  ids_session:this.ids_session,
+                  appId:this.appId
                 }
               })
               wx.hideLoading()
